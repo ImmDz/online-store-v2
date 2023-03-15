@@ -1,4 +1,4 @@
-import { Category, Good, GoodInCart } from "types/general";
+import { Category, Good, GoodInCart } from "src/types/general";
 
 const get = <T>(url: string): Promise<T> => {
   return new Promise((resolve) => {
