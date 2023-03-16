@@ -1,4 +1,9 @@
-import { Category, Good, GoodInCart } from "src/types/general";
+import {
+  Category,
+  Good,
+  GoodInCart,
+  PopularCategories,
+} from "src/types/general";
 
 const get = <T>(url: string): Promise<T> => {
   return new Promise((resolve) => {
@@ -20,9 +25,7 @@ export const getCategories = (): Promise<{ categories: Category[] }> =>
 export const getGoods = (): Promise<{ items: Good[]; total: number }> =>
   get("/api/goods");
 
-export const getPopularCategories = (): Promise<{
-  category: Category;
-  items: Good[];
-}> => get("/api/popular_categories");
+export const getPopularCategories = (): Promise<PopularCategories[]> =>
+  get("/api/popular_categories");
 
 export const getCart = (): Promise<GoodInCart[]> => get("/api/cart");

@@ -30,3 +30,8 @@ export interface GoodsSearch {
   sortBy: keyof Good;
   sortDirection: "asc" | "desc";
 }
+
+export interface PopularCategories {
+  category: Category;
+  items: Good[];
+}

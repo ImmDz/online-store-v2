@@ -1,18 +1,16 @@
 import { LOAD_STATUSES } from "src/types/loadStatuses";
 import { createSlice, createAsyncThunk } from "@reduxjs/toolkit";
-import type { Category, Good } from "src/types/general";
+import type { PopularCategories } from "src/types/general";
 import { getPopularCategories } from "src/api/api";
 
 export interface State {
   loadStatus: LOAD_STATUSES;
-  category: Category | null;
-  goods: Good[];
+  popularItems: PopularCategories[];
 }
 
 const initialState: State = {
   loadStatus: LOAD_STATUSES.UNKNOWN,
-  category: null,
-  goods: [],
+  popularItems: [],
 };
 
 const SLICE_NAME = "popular_categories";
@@ -32,8 +30,7 @@ const { reducer, actions: popularActions } = createSlice({
     });
     builder.addCase(serverRequest.fulfilled, (state, action) => {
       state.loadStatus = LOAD_STATUSES.LOADED;
-      state.category = action.payload.category;
-      state.goods = action.payload.items;
+      state.popularItems = action.payload;
     });
   },
 });
