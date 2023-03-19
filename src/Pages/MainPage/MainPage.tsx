@@ -1,13 +1,26 @@
-import { FC } from "react";
+import { FC, useEffect, useCallback, useState } from "react";
 import { GoodCategory, Menu } from "src/components";
-import { getPopularCategories, getPopularLoadStatus } from "src/store";
+import { getPopularCategories, getPopularLoadStatus, goodActions, popularActions, categoryActions, getGoods } from "src/store";
 import { Layout, Image, Skeleton, Spin } from "antd";
+import { useAppDispatch } from "src/hooks/useAppDispatch";
 import { useSelector } from "react-redux";
+import { GoodsSearch } from "src/types/general";
 const { Content, Sider } = Layout;
 
 export const MainPage: FC = () => {
+    const dispatch = useAppDispatch();
     const popularCategories = useSelector(getPopularCategories);
     const loadStatus = useSelector(getPopularLoadStatus);
+    const goods = useSelector(getGoods);
+    const [params, setParams] = useState<Partial<GoodsSearch>>({ offset: 5, limit: 5 })
+    useEffect(() => {
+        categoryRequest();
+        popularRequest();
+        goodsRequest();
+    }, [])
+    const categoryRequest = useCallback(() => dispatch(categoryActions.serverRequest()), []);
+    const popularRequest = useCallback(() => dispatch(popularActions.serverRequest()), []);
+    const goodsRequest = useCallback(() => dispatch(goodActions.serverRequest(params)), []);
     return (
         <>
             <Sider theme="light">
@@ -20,7 +33,10 @@ export const MainPage: FC = () => {
                     </Skeleton.Node>
                 </div>
                 {loadStatus === "LOADING" ? <div className="loading"><Spin tip={loadStatus} /></div> :
-                    popularCategories.map((category) => <GoodCategory key={category.category.id} category={category.category} goods={category.items} />)}
+                    <ul className="popularCategories">
+                        {popularCategories.map((category) => <li key={category.category.id}><GoodCategory label={category.category.label} goods={category.items} /></li>)}
+                    </ul>
+                }
             </Content>
         </>
     )

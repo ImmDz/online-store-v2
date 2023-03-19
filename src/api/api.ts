@@ -2,8 +2,11 @@ import {
   Category,
   Good,
   GoodInCart,
+  GoodsSearch,
   PopularCategories,
 } from "src/types/general";
+
+const base_url = "http://localhost:3000/";
 
 const get = <T>(url: string): Promise<T> => {
   return new Promise((resolve) => {
@@ -19,11 +22,29 @@ const get = <T>(url: string): Promise<T> => {
   });
 };
 
-export const getCategories = (): Promise<{ categories: Category[] }> =>
-  get("/api/categories");
+export const getCategories = (
+  ids?: GoodsSearch["ids"]
+): Promise<{ categories: Category[] }> => {
+  const url = new URL("/api/categories", base_url);
+  if (ids) {
+    const urlParams = new URLSearchParams();
+    urlParams.append("ids", ids);
+    url.search = urlParams.toString();
+  }
+  return get(url.toString());
+};
 
-export const getGoods = (): Promise<{ items: Good[]; total: number }> =>
-  get("/api/goods");
+export const getGoods = (
+  params?: Partial<GoodsSearch>
+): Promise<{ items: Good[]; total: number }> => {
+  const url = new URL("/api/goods", base_url);
+  if (params) {
+    url.search = new URLSearchParams(
+      params as Record<string, string>
+    ).toString();
+  }
+  return get(url.toString());
+};
 
 export const getPopularCategories = (): Promise<PopularCategories[]> =>
   get("/api/popular_categories");

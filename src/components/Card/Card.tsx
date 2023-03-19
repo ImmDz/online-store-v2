@@ -10,9 +10,9 @@ export const Card: FC<CardProps> = ({ good }) => {
 
     return (
         <AntdCard>
-            <p>{good.label}</p>
+            <h3>{good.label}</h3>
             <p>{good.description}</p>
-            <p>{good.price}</p>
+            <p>{good.price}$</p>
         </AntdCard>
     )
 }
