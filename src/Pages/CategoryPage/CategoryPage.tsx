@@ -5,7 +5,7 @@ import { useParams } from "react-router";
 import { getGoods, getGoodsLoadStatus, goodActions } from "src/store";
 import { useAppDispatch } from "src/hooks/useAppDispatch";
 import { useSelector } from "react-redux";
-import { Card } from "src/components";
+import { GoodCategory } from "src/components";
 import { GoodsSearch } from "src/types/general";
 import { useNavigate, Link } from "react-router-dom";
 
@@ -27,8 +27,8 @@ export const CategoryPage: FC = () => {
     }
 
     return (
-        <Content>
-            {loadStatus === "LOADING" ? <Spin tip="Загрузка"></Spin> : <ul>{goods?.map((good) => <li key={good.id}><Card good={good}></Card></li>)}</ul>}
+        <Content style={{ maxWidth: "1400px" }}>
+            {loadStatus === "LOADING" ? <Spin tip="Загрузка"></Spin> : <GoodCategory label={""} goods={goods} />}
         </Content>
     )
 }

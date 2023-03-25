@@ -9,22 +9,15 @@ interface GoodCategoryProps {
 }
 
 export const GoodCategory: FC<GoodCategoryProps> = ({ label, goods }) => {
-
     return (
         <section className="category">
-            <h2>{label}</h2>
+            <h2 style={{ textAlign: "center" }}>{label}</h2>
             <List
                 grid={{
-                    gutter: 30,
-                    xs: 1,
-                    sm: 2,
-                    md: 2,
-                    lg: 2,
-                    xl: 4,
-                    xxl: 4,
+                    gutter: 10,
                 }}
                 dataSource={goods}
-                pagination={{ align: "start", pageSize: 4 }}
+                pagination={{ align: "center", pageSize: 4 }}
                 renderItem={(good) => (
                     <List.Item>
                         <Card good={good} />

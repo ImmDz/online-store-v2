@@ -50,3 +50,14 @@ export const getPopularCategories = (): Promise<PopularCategories[]> =>
   get("/api/popular_categories");
 
 export const getCart = (): Promise<GoodInCart[]> => get("/api/cart");
+
+const post = async (url: string, body: GoodInCart): Promise<GoodInCart[]> => {
+  return await fetch(new URL(url, base_url), {
+    method: "PUT",
+    body: JSON.stringify(body),
+  }).then((res) => res.json());
+};
+
+export const addToCart = (good: GoodInCart): Promise<GoodInCart[]> => {
+  return post("/api/cart", good);
+};

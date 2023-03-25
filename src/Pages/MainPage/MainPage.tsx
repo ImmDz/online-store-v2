@@ -16,17 +16,17 @@ export const MainPage: FC = () => {
     useEffect(() => {
         categoryRequest();
         popularRequest();
-        goodsRequest();
+        // goodsRequest();
     }, [])
     const categoryRequest = useCallback(() => dispatch(categoryActions.serverRequest()), []);
     const popularRequest = useCallback(() => dispatch(popularActions.serverRequest()), []);
-    const goodsRequest = useCallback(() => dispatch(goodActions.serverRequest(params)), []);
+    const goodsRequest = useCallback(() => dispatch(goodActions.serverRequest()), []);
     return (
         <>
             <Sider theme="light">
                 <Menu />
             </Sider>
-            <Content>
+            <Content style={{ maxWidth: "1400px" }}>
                 <div className="banner">
                     <Skeleton.Node active={true}>
                         <Image preview={false} src="https://source.unsplash.com/featured/1320x488?store" alt="banner-image" />

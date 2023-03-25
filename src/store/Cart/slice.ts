@@ -1,5 +1,5 @@
 import { createSlice, createAsyncThunk } from "@reduxjs/toolkit";
-import { getCart } from "src/api/api";
+import { getCart, addToCart } from "src/api/api";
 import type { GoodInCart } from "src/types/general";
 import { LOAD_STATUSES } from "src/types/loadStatuses";
 
@@ -15,7 +15,7 @@ const initialState: State = {
 
 const SLICE_NAME = "cart";
 
-const serverRequest = createAsyncThunk(SLICE_NAME, getCart);
+const serverRequest = createAsyncThunk(`${SLICE_NAME}/getCart`, getCart);
 
 const { reducer, actions: cartActions } = createSlice({
   name: SLICE_NAME,
