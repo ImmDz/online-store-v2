@@ -16,15 +16,15 @@ export const Card: FC<CardProps> = ({ good }) => {
                 active={true}
                 style={{ width: "100%", height: "200px" }}>
                 <Image preview={false} alt="product_img"
-                    src={`https://source.unsplash.com/featured/300x200?product=${good.id}`}
+                    src={`https://source.unsplash.com/featured/300x200?product`}
                     style={{ width: "100%", objectFit: "scale-down" }} />
             </Skeleton.Node>}
             style={{ height: "450px", width: "300px" }}>
             <AntdCard.Meta
                 title={
                     <Paragraph>
-                        Price: ${good.price}{" "}
-                        <Text delete type="danger">${+good.price * 1.5}.00</Text>
+                        Цена: ${good.price}{" "}
+                        <Text delete type="danger">${+good.price * 2}.00</Text>
                     </Paragraph>}
                 description={<Paragraph>{good.description}</Paragraph>} />
         </AntdCard>

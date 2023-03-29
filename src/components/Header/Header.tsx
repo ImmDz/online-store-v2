@@ -11,6 +11,7 @@ export const Header: FC = () => {
     return (
         <HeaderAntd style={{ display: "flex", alignItems: "center", justifyContent: "space-between" }}>
             <h1><Link style={{ color: "#f7f4c6" }} to="/">Banana Store</Link></h1>
+            <Link to="/goods">Все товары</Link>
             <Link to="/cart"><Badge count={cartGoods.map(good => good.count).reduce((acc, curr) => {
                 return acc + curr;
             }, 0)}>

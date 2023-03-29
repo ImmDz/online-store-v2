@@ -7,11 +7,10 @@ import { Link } from "react-router-dom";
 export const Menu: FC = () => {
     const categories = useSelector(getCategories);
     return (
-        <AntdMenu >
-            {categories.map((category) =>
-                <AntdMenu.Item key={category.id}>
-                    <Link to={`/category/${category.id}`}>{category.label}</Link>
-                </AntdMenu.Item>)}
+        <AntdMenu items={categories.map((category) => ({
+            label: <Link to={`/category/${category.id}`}>{category.label}</Link>,
+            key: category.id
+        }))}>
         </AntdMenu>
 
     )
