@@ -23,7 +23,11 @@ const serverRequest = createAsyncThunk(SLICE_NAME, api.login);
 const { reducer, actions: userActions } = createSlice({
   name: SLICE_NAME,
   initialState,
-  reducers: {},
+  reducers: {
+    setAuth: (state, action) => {
+      state.isAuth = action.payload;
+    },
+  },
   extraReducers: (builder) => {
     builder.addCase(serverRequest.pending, (state) => {
       state.loadStatus = LOAD_STATUSES.LOADING;
@@ -31,6 +35,7 @@ const { reducer, actions: userActions } = createSlice({
     builder.addCase(serverRequest.rejected, (state) => {
       state.loadStatus = LOAD_STATUSES.ERROR;
       state.isAuth = false;
+      console.log(state.loadStatus);
     });
     builder.addCase(serverRequest.fulfilled, (state, action) => {
       state.loadStatus = LOAD_STATUSES.LOADED;

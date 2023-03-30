@@ -4,10 +4,11 @@ import * as yup from 'yup';
 import { orderBy } from 'lodash';
 import * as jose from 'jose'
 
+
 const APP_CONFIG = {
     DEFAULT_RESPONSE_DELAY: 0,
     TOKEN_TTL: '24h',
-    USE_AUTH_CHECK: false,
+    USE_AUTH_CHECK: true,
     LOG_BE_ERRORS: true,
 }
 
@@ -44,9 +45,10 @@ const validateProduct = getValidator(productSchema);
 const validateCartProduct = getValidator(cartProductSchema);
 const validateUserCredentials = getValidator(userCredentialsSchema);
 
-const generateSecret = async () => {
-    return jose.generateSecret('HS256');
-}
+const secret = new TextEncoder().encode(
+    'cc7e0d44fd473002f1c42167459001140ec6389b7353f8088f4d9a95f2f596f2',
+)
+const alg = 'HS256'
 
 const DEFAULT_HEADERS = {};
 
@@ -76,17 +78,22 @@ const logBackendError = (e) => {
     console.groupEnd();
 }
 
-const verifyRequest = async (request, users) => {
-    // if (!APP_CONFIG.USE_AUTH_CHECK) {
-    //     return;
-    // }
+const verifyRequest = async (request, users, requiredRole) => {
+    if (!APP_CONFIG.USE_AUTH_CHECK) {
+        return;
+    }
 
     try {
         const token = (request.requestHeaders.Authorization || '').split(' ')[1];
-        const credentials = await jose.jwtVerify(token, await generateSecret());
+        const { payload: credentials } = await jose.jwtVerify(token, secret);
+
         const user = users.findBy({ login: credentials.login, password: credentials.password });
 
         if (!user) {
+            return new Response(RESPONSE_CODES.FORBIDDEN, DEFAULT_HEADERS, RESPONSE_MESSAGES.INVALID_TOKEN);
+        }
+
+        if (requiredRole && credentials.login !== requiredRole) {
             return new Response(RESPONSE_CODES.FORBIDDEN, DEFAULT_HEADERS, RESPONSE_MESSAGES.INVALID_TOKEN);
         }
     } catch (e) {
@@ -99,10 +106,18 @@ const verifyRequest = async (request, users) => {
 }
 
 const getCart = (schema) => {
-    return schema.carts.where(({ count }) => count > 0).models
-        .map(({ attrs: { productId, ...restGood } }) => ({
-            ...restGood,
-            id: productId,
+    const cart = schema.carts.where(({ count }) => count > 0).models;
+    const countById = cart.reduce((acc, { attrs: { productId, count } }) => (acc[productId] = count, acc), {});
+
+    const productsIds = schema.carts.where(({ count }) => count > 0).models.map(({ attrs: { productId } }) => productId);
+
+    const products = schema.goods.where(({ id }) => productsIds.includes(id)).models;
+
+    return products
+        .map(({ attrs: { ...good } }) => ({
+            good,
+            count: countById[good.id],
+            id: good.id,
         }));
 };
 
@@ -206,7 +221,11 @@ createServer({
         });
 
         this.post('/goods', async (schema, request) => {
-            // todo check admin
+            const authError = await verifyRequest(request, schema.users, 'admin');
+            if (authError) {
+                return authError;
+            }
+
             const product = JSON.parse(request.requestBody) ?? {};
 
             const errors = await validateProduct(product);
@@ -218,13 +237,21 @@ createServer({
             return schema.goods.create(product);
         });
 
-        this.delete("/goods/:id", (schema, request) => {
-            // todo check admin
+        this.delete("/goods/:id", async (schema, request) => {
+            const authError = await verifyRequest(request, schema.users, 'admin');
+            if (authError) {
+                return authError;
+            }
+
             return schema.goods.find(request.params.id).destroy()
         });
 
         this.put("/goods/:id", async (schema, request) => {
-            // todo check admin
+            const authError = await verifyRequest(request, schema.users, 'admin');
+            if (authError) {
+                return authError;
+            }
+
             const product = JSON.parse(request.requestBody) ?? {};
 
             const errors = await validateProduct(product);
@@ -295,7 +322,11 @@ createServer({
 
             const { login, password } = user;
 
-            const token = await new jose.SignJWT({ login, password }).setProtectedHeader({ alg: 'HS256' }).setExpirationTime(APP_CONFIG.TOKEN_TTL).sign(await generateSecret());
+            const token = await new jose
+                .SignJWT({ login, password })
+                .setProtectedHeader({ alg })
+                .setExpirationTime(APP_CONFIG.TOKEN_TTL)
+                .sign(secret);
 
             return new Response(RESPONSE_CODES.OK, DEFAULT_HEADERS, { login, token });
         });

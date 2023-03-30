@@ -35,3 +35,8 @@ export interface PopularCategories {
   category: Category;
   items: Good[];
 }
+
+export interface User {
+  login: string;
+  password: string;
+}

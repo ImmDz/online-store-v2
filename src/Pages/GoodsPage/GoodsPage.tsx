@@ -40,9 +40,7 @@ export const GoodsPage: FC = () => {
     }, []);
 
     useEffect(() => {
-        if (params) {
-            goodsRequest(params);
-        } else dispatch(goodActions.serverRequest());
+        goodsRequest(params);
     }, [params]);
 
     useEffect(() => {
@@ -58,7 +56,6 @@ export const GoodsPage: FC = () => {
     };
 
     const goodsRequest = useCallback(debounce((params: Partial<GoodsSearch>) => dispatch(goodActions.serverRequest(params)), 1_500), []);
-    const debouncedSetParams = throttle(debounce((newParams: Partial<GoodsSearch>) => setParams((prevParams) => ({ ...prevParams, ...newParams })), 1_500), 1_000);
     const onSorterChange = (selectedSorter: keyof Good) => {
         setParams({ ...params, sortBy: selectedSorter, sortDirection: filter.sortDirections ? "asc" : "desc", offset: 0 });
         setFilter({ ...filter, sorter: selectedSorter, currentPage: 1 });
@@ -74,7 +71,7 @@ export const GoodsPage: FC = () => {
                     onChange={(e) => setFilter({ ...filter, searchValue: e.target.value })}
                     onSearch={(value) => {
                         if (value.trim()) {
-                            debouncedSetParams({ ...params, text: value, offset: 0 })
+                            setParams({ ...params, text: value, offset: 0 })
                         }
                         if (params.text) {
                             delete params.text;
@@ -92,7 +89,7 @@ export const GoodsPage: FC = () => {
                         <Select.Option value="label">Название</Select.Option>
                         <Select.Option value="price">Цена</Select.Option>
                     </Select>
-                    <Switch checked={filter?.sortDirections} defaultChecked={true} checkedChildren="По возрастанию" unCheckedChildren="По убыванию" onChange={(value) => {
+                    <Switch checked={filter?.sortDirections} defaultChecked={true} checkedChildren={params.sortBy === "label" ? 'A-Z' : "По возрастанию"} unCheckedChildren={params.sortBy === "label" ? 'Z-A' : "По убыванию"} onChange={(value) => {
                         if (params?.sortBy) {
                             value ? setParams({ ...params, sortDirection: 'asc', offset: 0 }) : setParams({ ...params, sortDirection: 'desc', offset: 0 });
                         }
@@ -118,7 +115,7 @@ export const GoodsPage: FC = () => {
                         min={0}
                         max={1000}
                         onChange={(value) => {
-                            debouncedSetParams({ ...params, minPrice: value[0], maxPrice: value[1], offset: 0 });
+                            setParams({ ...params, minPrice: value[0], maxPrice: value[1], offset: 0 });
                             setFilter({ ...filter, currentPage: 1 });
                         }}
                     />

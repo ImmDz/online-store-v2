@@ -4,29 +4,23 @@ import {
   GoodInCart,
   GoodsSearch,
   PopularCategories,
+  User,
 } from "src/types/general";
-
-interface User {
-  login: string;
-  password: string;
-}
 
 class Api {
   base_url = "http://localhost:3000/";
   get = <T>(url: string): Promise<T> => {
     const token = localStorage.getItem("token");
     return new Promise((resolve) => {
-      setTimeout(() => {
-        fetch(url, {
-          ...(token && { headers: { Authorization: `Bearer ${token}` } }),
+      fetch(url, {
+        ...(token && { headers: { Authorization: `Bearer ${token}` } }),
+      })
+        .then((data) => {
+          if (data.ok) {
+            return data.json();
+          } else throw new Error("error");
         })
-          .then((data) => {
-            if (data.ok) {
-              return data.json();
-            } else throw new Error("error");
-          })
-          .then(resolve);
-      }, 1_500);
+        .then(resolve);
     });
   };
 
@@ -48,8 +42,9 @@ class Api {
       body: JSON.stringify(body),
       headers: { Authorization: `Bearer ${token}` },
     }).then((res) => {
-      console.log(localStorage.getItem("token"));
-      return res.json();
+      if (res.ok) {
+        return res.json();
+      } else throw new Error("Только для зарегистрированных пользователей");
     });
   };
 
