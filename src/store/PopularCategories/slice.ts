@@ -1,7 +1,7 @@
 import { LOAD_STATUSES } from "src/types/loadStatuses";
 import { createSlice, createAsyncThunk } from "@reduxjs/toolkit";
 import type { PopularCategories } from "src/types/general";
-import { getPopularCategories } from "src/api/api";
+import { api } from "src/api/api";
 
 export interface State {
   loadStatus: LOAD_STATUSES;
@@ -15,7 +15,7 @@ const initialState: State = {
 
 const SLICE_NAME = "popular_categories";
 
-const serverRequest = createAsyncThunk(SLICE_NAME, getPopularCategories);
+const serverRequest = createAsyncThunk(SLICE_NAME, api.getPopularCategories);
 
 const { reducer, actions: popularActions } = createSlice({
   name: SLICE_NAME,

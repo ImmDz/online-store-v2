@@ -7,7 +7,7 @@ import { useParams, useNavigate, Link } from "react-router-dom";
 import { getGoods, getGoodsLoadStatus, goodActions, cartActions, getCartGoods } from "src/store";
 import { useSelector } from "react-redux";
 import { useAppDispatch } from "src/hooks/useAppDispatch";
-import { addToCart } from "src/api/api";
+import { api } from "src/api/api";
 
 export const ProductPage: FC = () => {
     const loadStatus = useSelector(getGoodsLoadStatus);
@@ -27,7 +27,7 @@ export const ProductPage: FC = () => {
     const countGoodsInCart = cartGoods.find(good => good.id === ids)?.count ?? 0;
     const addToCarts = () => {
         if (count > 0) {
-            addToCart({ good: { ...goods[0], price: String(+goods[0].price * count) }, count: countGoodsInCart + count, id: goods[0].id }).then(getCart);
+            api.addToCart({ good: { ...goods[0], price: String(+goods[0].price * count) }, count: countGoodsInCart + count, id: goods[0].id }).then(getCart);
         }
     }
 

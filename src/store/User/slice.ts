@@ -1,23 +1,26 @@
 import { createSlice, createAsyncThunk } from "@reduxjs/toolkit";
 import { api } from "src/api/api";
-import type { GoodInCart } from "src/types/general";
 import { LOAD_STATUSES } from "src/types/loadStatuses";
 
 export interface State {
+  login: string;
+  token: string;
+  isAuth: boolean;
   loadStatus: LOAD_STATUSES;
-  cartGoods: GoodInCart[];
 }
 
 const initialState: State = {
+  isAuth: localStorage.getItem("token") ? true : false,
+  login: "",
+  token: "",
   loadStatus: LOAD_STATUSES.UNKNOWN,
-  cartGoods: [],
 };
 
-const SLICE_NAME = "cart";
+const SLICE_NAME = "user";
 
-const serverRequest = createAsyncThunk(SLICE_NAME, api.getCart);
+const serverRequest = createAsyncThunk(SLICE_NAME, api.login);
 
-const { reducer, actions: cartActions } = createSlice({
+const { reducer, actions: userActions } = createSlice({
   name: SLICE_NAME,
   initialState,
   reducers: {},
@@ -27,13 +30,16 @@ const { reducer, actions: cartActions } = createSlice({
     });
     builder.addCase(serverRequest.rejected, (state) => {
       state.loadStatus = LOAD_STATUSES.ERROR;
+      state.isAuth = false;
     });
     builder.addCase(serverRequest.fulfilled, (state, action) => {
       state.loadStatus = LOAD_STATUSES.LOADED;
-      state.cartGoods = action.payload;
+      state.login = action.payload.login;
+      state.isAuth = true;
+      localStorage.setItem("login", state.login);
     });
   },
 });
 
 export { reducer };
-export const actions = { ...cartActions, serverRequest };
+export const actions = { ...userActions, serverRequest };

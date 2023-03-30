@@ -1,5 +1,5 @@
 import { Routes, Route } from 'react-router-dom';
-import { MainPage, CategoryPage, ProductPage, CartPage, GoodsPage } from "./Pages";
+import { MainPage, CategoryPage, ProductPage, CartPage, GoodsPage, LoginPage } from "./Pages";
 import { Header } from "src/components";
 import { Layout } from 'antd';
 const { Footer } = Layout;
@@ -15,6 +15,7 @@ export const App = () => {
           <Route path="/product/:ids" element={<ProductPage />}></Route>
           <Route path="/cart" element={<CartPage />}></Route>
           <Route path="/goods" element={<GoodsPage />}></Route>
+          <Route path="/login" element={<LoginPage />}></Route>
         </Routes>
       </Layout>
       <Footer>footer</Footer>

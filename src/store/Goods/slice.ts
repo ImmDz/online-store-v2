@@ -1,7 +1,7 @@
 import type { Good } from "src/types/general";
 import { LOAD_STATUSES } from "src/types/loadStatuses";
 import { createSlice, createAsyncThunk } from "@reduxjs/toolkit";
-import { getGoods } from "src/api/api";
+import { api } from "src/api/api";
 
 export interface State {
   loadStatus: LOAD_STATUSES;
@@ -16,7 +16,7 @@ const initialState: State = {
 };
 
 const SLICE_NAME = "goods";
-const serverRequest = createAsyncThunk(SLICE_NAME, getGoods);
+const serverRequest = createAsyncThunk(SLICE_NAME, api.getGoods);
 
 const { reducer, actions: goodsActions } = createSlice({
   name: SLICE_NAME,

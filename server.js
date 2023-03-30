@@ -11,15 +11,20 @@ const APP_CONFIG = {
     LOG_BE_ERRORS: true,
 }
 
-const prodcutSchema = yup.object().shape({
-    good: yup.object().shape({
-        categoryTypeId: yup.string().required(),
-        description: yup.string().required(),
-        id: yup.string().required(),
-        img: yup.string().required(),
-        label: yup.string().required(),
-        price: yup.string().required(),
-    }),
+const productSchema = yup.object().shape({
+    categoryTypeId: yup.string().required(),
+    description: yup.string().required(),
+    img: yup.string().required(),
+    label: yup.string().required(),
+    price: yup.string().required(),
+});
+
+const fullProductSchema = productSchema.shape({
+    id: yup.string().required(),
+})
+
+const cartProductSchema = yup.object().shape({
+    good: fullProductSchema,
     count: yup.number().required().min(0).integer(),
 });
 
@@ -35,12 +40,12 @@ const getValidator = (schema) => async (entity) => {
         .catch(({ inner }) => inner.map((e) => e.message?.split(' at createError')[0] ?? e))
 }
 
-const validateProduct = getValidator(prodcutSchema);
+const validateProduct = getValidator(productSchema);
+const validateCartProduct = getValidator(cartProductSchema);
 const validateUserCredentials = getValidator(userCredentialsSchema);
 
 const generateSecret = async () => {
     return jose.generateSecret('HS256');
-
 }
 
 const DEFAULT_HEADERS = {};
@@ -72,14 +77,13 @@ const logBackendError = (e) => {
 }
 
 const verifyRequest = async (request, users) => {
-    if (!APP_CONFIG.USE_AUTH_CHECK) {
-        return;
-    }
+    // if (!APP_CONFIG.USE_AUTH_CHECK) {
+    //     return;
+    // }
 
     try {
         const token = (request.requestHeaders.Authorization || '').split(' ')[1];
         const credentials = await jose.jwtVerify(token, await generateSecret());
-        console.log({ credentials })
         const user = users.findBy({ login: credentials.login, password: credentials.password });
 
         if (!user) {
@@ -95,8 +99,7 @@ const verifyRequest = async (request, users) => {
 }
 
 const getCart = (schema) => {
-    return schema.carts.all().models
-        .filter(({ attrs: { count } }) => count)
+    return schema.carts.where(({ count }) => count > 0).models
         .map(({ attrs: { productId, ...restGood } }) => ({
             ...restGood,
             id: productId,
@@ -202,6 +205,39 @@ createServer({
             };
         });
 
+        this.post('/goods', async (schema, request) => {
+            // todo check admin
+            const product = JSON.parse(request.requestBody) ?? {};
+
+            const errors = await validateProduct(product);
+
+            if (errors.length) {
+                return new Response(RESPONSE_CODES.BAD_REQUEST, DEFAULT_HEADERS, errors)
+            };
+
+            return schema.goods.create(product);
+        });
+
+        this.delete("/goods/:id", (schema, request) => {
+            // todo check admin
+            return schema.goods.find(request.params.id).destroy()
+        });
+
+        this.put("/goods/:id", async (schema, request) => {
+            // todo check admin
+            const product = JSON.parse(request.requestBody) ?? {};
+
+            const errors = await validateProduct(product);
+
+            if (errors.length) {
+                return new Response(RESPONSE_CODES.BAD_REQUEST, DEFAULT_HEADERS, errors)
+            };
+
+            const { id, ...restProduct } = product;
+
+            return schema.goods.where({ id }).update(restProduct)
+        });
+
         this.get('/cart', async (schema, request) => {
             const authError = await verifyRequest(request, schema.users);
             if (authError) {
@@ -220,7 +256,7 @@ createServer({
             try {
                 const product = JSON.parse(request.requestBody) ?? {};
 
-                const errors = await validateProduct(product);
+                const errors = await validateCartProduct(product);
 
                 if (errors.length) {
                     return new Response(RESPONSE_CODES.BAD_REQUEST, DEFAULT_HEADERS, errors)
@@ -259,8 +295,6 @@ createServer({
 
             const { login, password } = user;
 
-            //   const token = jwt.sign({ login, password }, JWT_SECRET, { expiresIn: APP_CONFIG.TOKEN_TTL });
-            console.log({ login, password })
             const token = await new jose.SignJWT({ login, password }).setProtectedHeader({ alg: 'HS256' }).setExpirationTime(APP_CONFIG.TOKEN_TTL).sign(await generateSecret());
 
             return new Response(RESPONSE_CODES.OK, DEFAULT_HEADERS, { login, token });
