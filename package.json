@@ -28,7 +28,9 @@
   "scripts": {
     "start": "webpack serve --mode development --history-api-fallback",
     "build": "webpack",
-    "test": "jest"
+    "test": "jest",
+    "predeploy": "npm run build",
+    "deploy": "gh-pages -d dist"
   },
   "eslintConfig": {
     "extends": [
