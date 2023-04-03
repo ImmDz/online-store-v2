@@ -1,4 +1,4 @@
-import { FC, useCallback, useEffect, useState } from "react";
+import { FC, useEffect, useState } from "react";
 import { Content } from "antd/es/layout/layout";
 import { Spin } from "antd";
 import { useParams } from "react-router";
@@ -18,17 +18,18 @@ export const CategoryPage: FC = () => {
     const navigate = useNavigate();
     useEffect(() => {
         goodsRequest();
-    }, [ids])
+    }, [ids]);
 
-    const goodsRequest = useCallback(() => dispatch(goodActions.serverRequest(params)), []);
+    const findCategory = () => goods.find((good) => good.categoryTypeId === ids);
+    const goodsRequest = () => dispatch(goodActions.serverRequest(params));
 
     if (loadStatus === "UNKNOWN" || loadStatus === "ERROR") {
-        return <Content><p>Категория не найдена, вернуться <Link to="" onClick={() => navigate(-1)}>назад</Link></p></Content>
+        return <Content className="content"><p>Категория не найдена, вернуться <Link to="" onClick={() => navigate(-1)}>назад</Link></p></Content>
     }
 
     return (
-        <Content style={{ maxWidth: "1400px" }}>
-            {loadStatus === "LOADING" ? <Spin tip="Загрузка"></Spin> : <GoodCategory label={""} goods={goods} />}
+        <Content className="content">
+            {loadStatus === "LOADING" ? <div className="loading"><Spin tip="Загрузка"></Spin></div> : <GoodCategory label={findCategory()?.label!} goods={goods} />}
         </Content>
     )
 }

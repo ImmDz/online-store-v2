@@ -1,39 +1,47 @@
-import { FC, useEffect, useCallback, useState } from "react";
+import { FC, useEffect, useState } from "react";
 import { GoodCategory, Menu } from "src/components";
-import { getPopularCategories, getPopularLoadStatus, goodActions, popularActions, categoryActions, getGoods } from "src/store";
-import { Layout, Image, Skeleton, Spin } from "antd";
+import { getPopularCategories, getPopularLoadStatus, popularActions, categoryActions } from "src/store";
+import { Layout, Image, Skeleton, Spin, Drawer, FloatButton, Button } from "antd";
 import { useAppDispatch } from "src/hooks/useAppDispatch";
 import { useSelector } from "react-redux";
-import { GoodsSearch } from "src/types/general";
+import css from "./mainPage.module.css";
 const { Content, Sider } = Layout;
 
 export const MainPage: FC = () => {
     const dispatch = useAppDispatch();
     const popularCategories = useSelector(getPopularCategories);
     const loadStatus = useSelector(getPopularLoadStatus);
-    const goods = useSelector(getGoods);
-    const [params, setParams] = useState<Partial<GoodsSearch>>({ offset: 5, limit: 5 })
+    const [open, setOpen] = useState(false);
     useEffect(() => {
         categoryRequest();
         popularRequest();
-        // goodsRequest();
     }, [])
-    const categoryRequest = useCallback(() => dispatch(categoryActions.serverRequest()), []);
-    const popularRequest = useCallback(() => dispatch(popularActions.serverRequest()), []);
-    const goodsRequest = useCallback(() => dispatch(goodActions.serverRequest()), []);
+    const categoryRequest = () => dispatch(categoryActions.serverRequest());
+    const popularRequest = () => dispatch(popularActions.serverRequest());
+    const showDrawer = () => {
+        setOpen(true);
+    };
+
+    const onClose = () => {
+        setOpen(false);
+    };
     return (
         <>
-            <Sider theme="light">
+            <Sider className={css.categoriesMenu} theme="light">
                 <Menu />
             </Sider>
-            <Content style={{ maxWidth: "1400px" }}>
-                <div className="banner">
-                    <Skeleton.Node active={true}>
-                        <Image preview={false} src="https://source.unsplash.com/featured/1320x488?store" alt="banner-image" />
+            <Content className="content">
+                <Drawer placement="left" className={css.hiddenMenu} onClose={onClose} open={open}>
+                    <Menu />
+                </Drawer>
+                <FloatButton className={css.floatButton} onClick={showDrawer} />
+                <div className={css.banner}>
+                    <Skeleton.Node className={css.imgPlug} active={true}>
+                        <Image className={css.bannerImg} preview={false} src="https://source.unsplash.com/featured/1320x488?store" alt="banner-image" />
                     </Skeleton.Node>
                 </div>
                 {loadStatus === "LOADING" ? <div className="loading"><Spin tip={loadStatus} /></div> :
-                    <ul className="popularCategories">
+                    <ul className={css.popularCategories}>
                         {popularCategories.map((category) => <li key={category.category.id}><GoodCategory label={category.category.label} goods={category.items} /></li>)}
                     </ul>
                 }

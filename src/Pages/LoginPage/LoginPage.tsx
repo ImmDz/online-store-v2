@@ -6,6 +6,7 @@ import { Link } from "react-router-dom";
 import { userActions, getIsAuthValue, getUserLoadStatus } from "src/store";
 import { useAppDispatch } from "src/hooks/useAppDispatch";
 import { useNavigate } from "react-router-dom";
+import css from "./login.module.css";
 
 export const LoginPage: FC = () => {
     const dispatch = useAppDispatch();
@@ -25,8 +26,10 @@ export const LoginPage: FC = () => {
         }
     }, [loadStatus])
     return (
-        <Content>
-            <Form>
+        <Content className="content">
+            <h2 className="categoryTitle">Вход</h2>
+            <Form className={css.loginForm}
+            >
                 <Form.Item
                     label="Логин"
                     name="логин"
@@ -42,14 +45,14 @@ export const LoginPage: FC = () => {
                     <Input onChange={(e) => setPassword(e.target.value)} />
                 </Form.Item>
                 <Form.Item>
-                    <Button onClick={() => {
+                    <Button className={css.loginButton} onClick={() => {
                         if (!login.trim() || !password.trim()) {
                             message.open({ type: 'warning', content: "Оба поля должны быть заполнены!" });
                         } else {
-                            dispatch(userActions.serverRequest({ login: login, password: password }));
+                            dispatch(userActions.login({ login: login, password: password }));
                         }
                     }} type="primary" htmlType="submit">Войти</Button>
-                    <Link to="/registration"><Button>Зарегистрироваться</Button></Link>
+                    <Button className={css.signInButton}><Link to="/registration">Зарегистрироваться</Link></Button>
                 </Form.Item>
             </Form>
         </Content>

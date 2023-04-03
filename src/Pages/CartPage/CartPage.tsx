@@ -1,9 +1,10 @@
 import { FC, useEffect } from "react";
-import { Content } from "antd/es/layout/layout";
+import { Layout } from "antd";
 import { cartActions, getCartGoods } from "src/store";
 import { useAppDispatch } from "src/hooks/useAppDispatch";
 import { useSelector } from "react-redux";
 import { List, Descriptions, Card, Button } from "antd";
+import css from "./cart.module.css";
 
 export const CartPage: FC = () => {
     const dispatch = useAppDispatch();
@@ -18,9 +19,9 @@ export const CartPage: FC = () => {
         return acc + curr;
     }, 0);
     return (
-        <Content style={{ maxWidth: "1400px" }}>
-            <div className="cart" style={{ display: "flex", gap: "50px", alignItems: "flex-start" }}>
-                <List style={{ width: "100%", backgroundColor: "white", borderRadius: "5px" }} size="small" itemLayout="vertical" dataSource={cartGoods} renderItem={(item) => (
+        <Layout.Content className="content">
+            <div className={css.cart}>
+                <List className={css.cartList} size="small" itemLayout="vertical" dataSource={cartGoods} renderItem={(item) => (
                     <List.Item
                         key={item.id}
                         extra={
@@ -32,8 +33,8 @@ export const CartPage: FC = () => {
                         }
                     >
                         <Descriptions>
-                            <Descriptions.Item>{item.good.label}</Descriptions.Item>
-                            <Descriptions.Item>{item.good.description}</Descriptions.Item>
+                            <Descriptions.Item className={css.info}>{item.good.label}</Descriptions.Item>
+                            <Descriptions.Item className={css.info}>{item.good.description}</Descriptions.Item>
                         </Descriptions>
                         <Descriptions>
                             <Descriptions.Item label="Цена">{item.good.price}$</Descriptions.Item>
@@ -42,13 +43,12 @@ export const CartPage: FC = () => {
                     </List.Item>
                 )}>
                 </List>
-                <Card style={{ width: "300px" }}>
-                    <p>Итого: ${totalPrice}</p>
-                    <p>Всего товаров: {totalCount}</p>
-                    <Button style={{ width: "100%", backgroundColor: "#f7f4c6" }}>Купить</Button>
+                <Card className={css.buycard}>
+                    <p className={css.info}>Итого: ${totalPrice}</p>
+                    <p className={css.info}>Всего товаров: {totalCount}</p>
+                    <Button className={css.buyButton}>Купить</Button>
                 </Card>
-
             </div>
-        </Content>
+        </Layout.Content>
     )
 }

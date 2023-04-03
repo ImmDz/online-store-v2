@@ -1,3 +1,5 @@
+import { Dayjs } from "dayjs";
+
 export interface Category {
   id: string;
   type: string;
@@ -36,7 +38,23 @@ export interface PopularCategories {
   items: Good[];
 }
 
-export interface User {
+export interface Credentials {
   login: string;
   password: string;
+}
+
+export interface User {
+  name: string;
+  surname?: string;
+  login: string;
+  password: string;
+  repeatedPassword: string;
+  gender?: string;
+  interests: string[];
+  isSubscribe: boolean;
+  secret?: {
+    type: string;
+    answer: string;
+  };
+  bornAt: string;
 }

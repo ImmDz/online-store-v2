@@ -5,6 +5,7 @@ import {
   GoodsSearch,
   PopularCategories,
   User,
+  Credentials,
 } from "src/types/general";
 
 class Api {
@@ -24,8 +25,8 @@ class Api {
     });
   };
 
-  post = (url: string, body: User) => {
-    return fetch(new URL(url, this.base_url), {
+  post = async (url: string, body: User | Credentials) => {
+    return await fetch(new URL(url, this.base_url), {
       method: "POST",
       body: JSON.stringify(body),
     }).then((res) => {
@@ -81,11 +82,18 @@ class Api {
     return this.put("/api/cart", good);
   };
 
-  login = (user: User): Promise<{ login: string; token: string }> => {
-    return this.post("/api/login", user).then((res) => {
-      localStorage.setItem("token", res.token);
-      return res;
-    });
+  login = async (
+    cred: Credentials
+  ): Promise<{ login: string; token: string }> => {
+    const res = await this.post("/api/login", cred);
+    localStorage.setItem("token", res.token);
+    return res;
+  };
+
+  registration = async (user: User): Promise<{ user: User }> => {
+    const res = await this.post("/api/registration", user);
+    this.login({ login: user.login, password: user.password });
+    return res;
   };
 }
 

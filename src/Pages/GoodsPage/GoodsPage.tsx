@@ -1,11 +1,12 @@
 import { FC, useEffect, useState, useCallback } from "react";
-import { Input, Select, Slider, Table, Button, Pagination, Switch, Layout } from "antd";
+import { Input, Select, Slider, Table, Button, Pagination, Switch, Layout, Space } from "antd";
 import { categoryActions, goodActions, getGoods, getCategories, getGoodsLoadStatus, getTotal } from "src/store";
 import { useSelector } from "react-redux";
 import { useAppDispatch } from "src/hooks/useAppDispatch";
 import { Good, GoodsSearch } from "src/types/general";
-import { debounce, throttle } from "lodash";
+import { debounce } from "lodash";
 import { Link, useNavigate } from "react-router-dom";
+import css from "./goodsPage.module.css";
 const { Search } = Input;
 const { Content } = Layout;
 
@@ -19,7 +20,6 @@ interface Filter {
 
 export const GoodsPage: FC = () => {
     const loadStatus = useSelector(getGoodsLoadStatus);
-    const navigate = useNavigate();
     const goods = useSelector(getGoods);
     const totalGoods = useSelector(getTotal);
     const categories = useSelector(getCategories);
@@ -61,9 +61,10 @@ export const GoodsPage: FC = () => {
         setFilter({ ...filter, sorter: selectedSorter, currentPage: 1 });
     }
     return (
-        <Content>
-            <div className="filter">
+        <Content className="content">
+            <div className={css.filter}>
                 <Search
+                    className={css.searchInput}
                     value={filter?.searchValue}
                     placeholder="Поиск по названию"
                     allowClear
@@ -84,7 +85,7 @@ export const GoodsPage: FC = () => {
                     value={filter?.selectValue}
                     onChange={(value) => setFilter({ ...filter, selectValue: value })}
                     options={categories.map((category) => ({ label: category.label, value: category.type }))} />
-                <span className="sorter-filter">
+                <Space className="sorter-filter">
                     <Select value={filter?.sorter} placeholder="Сортировать" onChange={onSorterChange}>
                         <Select.Option value="label">Название</Select.Option>
                         <Select.Option value="price">Цена</Select.Option>
@@ -97,13 +98,7 @@ export const GoodsPage: FC = () => {
                         onClick={(value) => {
                             setFilter({ ...filter, sortDirections: value, currentPage: 1 });
                         }} />
-                </span>
-                <Button
-                    onClick={() => {
-                        setParams({ limit: 20 });
-                        setFilter({ sortDirections: true, currentPage: 1 });
-                    }}>Сбросить
-                </Button>
+                </Space>
                 <div className="price-filter">
                     <h4>Диапазон цены</h4>
                     <Slider
@@ -120,8 +115,13 @@ export const GoodsPage: FC = () => {
                         }}
                     />
                 </div>
+                <Button
+                    onClick={() => {
+                        setParams({ limit: 20 });
+                        setFilter({ sortDirections: true, currentPage: 1 });
+                    }}>Сбросить
+                </Button>
             </div>
-            <Button onClick={() => console.log(filter)}>Show</Button>
             <Table
                 pagination={false}
                 loading={loadStatus === "LOADING"}

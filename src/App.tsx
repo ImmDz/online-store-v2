@@ -1,24 +1,28 @@
-import { Routes, Route } from 'react-router-dom';
-import { MainPage, CategoryPage, ProductPage, CartPage, GoodsPage, LoginPage } from "./Pages";
-import { Header } from "src/components";
+import { Routes, Route, Navigate } from 'react-router-dom';
+import { MainPage, CategoryPage, ProductPage, CartPage, GoodsPage, LoginPage, RegistrationPage } from "./Pages";
+import { getIsAuthValue } from './store';
+import { Header, Footer } from "src/components";
 import { Layout } from 'antd';
-const { Footer } = Layout;
+import { useSelector } from 'react-redux';
 
 export const App = () => {
+  const isAuth = useSelector(getIsAuthValue);
   return (
-    <Layout>
-      <Header></Header>
-      <Layout className="content">
+    <Layout className="wrapper">
+      <Header />
+      <Layout className="container">
         <Routes>
           <Route path="/" element={<MainPage />} />
           <Route path="/category/:ids" element={<CategoryPage />} />
           <Route path="/product/:ids" element={<ProductPage />}></Route>
-          <Route path="/cart" element={<CartPage />}></Route>
+          <Route path="/cart" element={isAuth ? <CartPage /> : <Navigate to="/login" />} />
           <Route path="/goods" element={<GoodsPage />}></Route>
           <Route path="/login" element={<LoginPage />}></Route>
+          <Route path="/registration" element={<RegistrationPage />}></Route>
+          <Route path="*" element={<Navigate to="/" />}></Route>
         </Routes>
       </Layout>
-      <Footer>footer</Footer>
+      <Footer />
     </Layout>
   );
 }

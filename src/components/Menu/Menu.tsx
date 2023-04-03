@@ -12,6 +12,5 @@ export const Menu: FC = () => {
             key: category.id
         }))}>
         </AntdMenu>
-
     )
 }
